@@ -43,15 +43,11 @@ base = alt.Chart(countries).mark_geoshape(
 custom_world = gpd.read_file('europe.geo.json')
 # change custom world geometry column to wrt
 
-# custom_world = alt.topo_feature('https://github.com/bkarduck/custom-jsons/blob/main/asia.geo.json', 'geometry')
-#simple polygon data, raw from github
-url_geojson = 'https://github.com/bkarduck/custom-jsons/blob/main/asia.geo.json'
-import json
 
-# read europe.geo.json
-# with open('europe.geo.json') as f:
-#     europe = json.load(f)
-# data_geojson_remote = alt.Data(url_geojson)
+#simple polygon data, raw from github
+# custom jsons https://geojson-maps.kyd.au
+url_geojson = 'https://github.com/bkarduck/custom-jsons/blob/main/asia.geo.json'
+
 
 # custom_world = alt.topo_feature('https://github.com/bkarduck/custom-jsons/blob/main/asia.geo.json', 'geometry')
 data_url_geojson = alt.Data(url=url_geojson, format=alt.DataFormat(property="features"))
