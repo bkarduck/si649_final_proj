@@ -15,6 +15,8 @@ pisa_total = pisa_df[pisa_df['sex'] == 'TOT']
 pisa_total = pisa_total.drop(columns=['country','index_code'])
 pisa_total['name'] = pisa_total['country_name']
 pisa_total['time'] = pisa_total['time'].astype(int)
+pisa_total['rating_bins'] = pd.qcut(pisa_total['rating'], q= [0, 0.2, 0.4, 0.6, 0.8, 1], labels=['Very Low', 'Low', 'Medium','High', 'Very High'])
+pisa_total['rating_bins_num'] = pd.qcut(pisa_total['rating'], q= [0, 0.2, 0.4, 0.6, 0.8, 1], labels=[1, 2, 3, 4, 5])
 
 url = "https://raw.githubusercontent.com/dallascard/si649_public/main/altair_hw4/small-airports.json"
 # europe= 'https://github.com/amcharts/amcharts4/blob/master/dist/geodata/es2015/json/region/world/europeUltra.json'
@@ -227,16 +229,29 @@ values = st.slider(
 # st.write('year selected:', values)
 
 pisa_filtered2 = pisa_total[pisa_total['time'] == values]
+
+
+axis_labels = (
+    "datum.label == 1 ? 'Very Low' : datum.label == 2 ? 'Low' : datum.label == 3 ? 'Medium' :datum.label == 4 ? 'High' :'Very High'"
+)
+
 eu_chart = alt.Chart(data_url_geojson,title='Europe').mark_geoshape(stroke='white').transform_filter(
         alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Europe', ])
     ).transform_lookup(
         lookup="properties.iso_a3",
         # can change this to other dfs
-        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating"]),
-    ).encode(
+        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating",'rating_bins_num', 'rating_bins']),
+    ).transform_filter(
+    'isValid(datum.rating_bins_num)'
+).encode(
         fill=alt.Color(
-            "rating:Q",
+            "rating_bins_num:O",
             scale=alt.Scale(scheme="reds"),
+            # order=alt.Order('rating_bins_num:O', sort='ascending'),
+            # sort= alt.SortField('rating_bins_num:O', order='ascending'),
+            legend=alt.Legend(title='Rating', labelExpr=axis_labels),
+            # ignore null
+
         ), 
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
@@ -250,7 +265,7 @@ eu_base = alt.Chart(data_url_geojson).mark_geoshape( fill='#666666',
     ).transform_lookup(
         lookup="properties.iso_a3",
         # can change this to other dfs
-        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating"]),
+        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating", 'rating_bins']),
     ).properties(width=400, height=250).project(
 type='mercator', reflectY=False, scale=150, translate=[150, 300])
 
@@ -260,11 +275,17 @@ na_chart =alt.Chart(data_url_geojson, title='North America').mark_geoshape(strok
     ).transform_filter(alt.FieldOneOfPredicate(field='properties.continent', oneOf=['North America', ])).transform_lookup(
         lookup="properties.iso_a3",
         # can change this to other dfs
-        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating"]),
-    ).encode(
+        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating", 'rating_bins_num', 'rating_bins']),
+    ).transform_filter(
+    'isValid(datum.rating_bins_num)'
+).encode(
         fill=alt.Color(
-            "rating:Q",
+            "rating_bins_num:O",
             scale=alt.Scale(scheme="reds"),
+            # sort= alt.SortField('rating_bins_num:O', order='ascending'),
+
+            # order=alt.Order('rating_bins_num:O', sort='ascending'),
+            legend=alt.Legend(title='Rating', labelExpr=axis_labels),
         ), 
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
@@ -275,17 +296,24 @@ na_base = alt.Chart(data_url_geojson).mark_geoshape(    fill='#666666',
     stroke='white').encode().transform_filter(alt.FieldOneOfPredicate(field='properties.continent', oneOf=['North America', ])).transform_lookup(
         lookup="properties.iso_a3",
         # can change this to other dfs
-        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating"])).properties(width=400, height=250)
+        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating",'rating_bins'])).properties(width=400, height=250)
 
 sa_chart = alt.Chart(data_url_geojson, title='South America').mark_geoshape(stroke='white').transform_filter(alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Americas', ])
     ).transform_filter(alt.FieldOneOfPredicate(field='properties.continent', oneOf=['South America', ])).transform_lookup(
         lookup="properties.iso_a3",
         # can change this to other dfs
-        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating"]),
-    ).encode(
+        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating", 'rating_bins', 'rating_bins_num']),
+    ).transform_filter(
+    'isValid(datum.rating_bins_num)'
+).encode(
         fill=alt.Color(
-            "rating:Q",
+            "rating_bins_num:O",
             scale=alt.Scale(scheme="reds"),
+            sort= alt.SortField('rating_bins_num:O', order='ascending'),
+
+            # order=alt.Order('rating_bins_num:O', sort='ascending'),
+            legend=alt.Legend(title='Rating', labelExpr=axis_labels),
+            # legend={1:'Very Low', 2:'Low', 3:'Medium',4:'High', 5:'Very High'}
         ), 
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
@@ -299,7 +327,7 @@ sa_base = alt.Chart(data_url_geojson).mark_geoshape( fill='#666666',
             alt.Tooltip("properties.name:N", title="Country"),]).transform_filter(alt.FieldOneOfPredicate(field='properties.continent', oneOf=['South America', ])).transform_lookup(
         lookup="properties.iso_a3",
         # can change this to other dfs
-        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating"])).properties(width=400, height=250).project(
+        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating",'rating_bins'])).properties(width=400, height=250).project(
 type='mercator', reflectY=False, scale=170, translate=[400, 50])
 
 
@@ -310,10 +338,17 @@ aus_asia_chart = alt.Chart(data_url_geojson,title='Australia and East Asia').mar
     ).transform_lookup(
         lookup="properties.iso_a3",
         # can change this to other dfs
-        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating"]),
-    ).encode(
+        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating",'rating_bins', 'rating_bins_num']),
+    ).transform_filter(
+    'isValid(datum.rating_bins_num)'
+).encode(
         fill=alt.Color(
-            "rating:Q",
+            "rating_bins_num:O",
+            #'rating:Q',
+            # sort= alt.SortField('rating_bins_num:O', order='ascending'),
+
+            # order=alt.Order('rating_bins_num:O', sort='ascending'),
+            legend=alt.Legend(title='Rating', labelExpr=axis_labels),
             scale=alt.Scale(scheme="reds"),
         ), 
         tooltip=[
