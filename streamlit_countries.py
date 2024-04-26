@@ -11,6 +11,10 @@ import geopandas as gpd
 pisa_df = pd.read_csv('PISA_data.csv')
 country_codes = pd.read_csv('country_codes.csv')
 pisa_df = pisa_df.merge(country_codes, left_on='country', right_on='code')
+pisa_df['name'] = pisa_df['country_name']
+pisa_df['time'] = pisa_df['time'].astype(int)
+
+
 pisa_total = pisa_df[pisa_df['sex'] == 'TOT']
 pisa_total = pisa_total.drop(columns=['country','index_code'])
 pisa_total['name'] = pisa_total['country_name']
@@ -372,4 +376,41 @@ st.altair_chart(final_chart, use_container_width=True)
 
 
 
+sex_choices=list(pisa_df["sex"].unique())
+# sex_choices=list(map(lambda x:int(x),sex_choices))
+# sex_choices.sort()
+
+
+selected_sex = st.radio('Select Sex (Or Total of Both):', options=sex_choices)
+pisa_sex_filtered = pisa_df[pisa_df['sex'] == selected_sex]
+
+
+pisa_sex_df = pisa_sex_filtered.groupby(['country_name', 'time'])['rating'].mean().reset_index()
+# get the scores of the 2018 rating - 2003 rating
+pisa_sex_df = pisa_sex_df.pivot(index='country_name', columns='time', values='rating')
+pisa_sex_df['change'] = pisa_sex_df[2018] - pisa_sex_df[2003]
+pisa_sex_df = pisa_sex_df.sort_values(by='change', ascending=False)
+pisa_sex_df['change2'] = pisa_sex_df[2018] - pisa_sex_df[2006]
+# if change is null, merge change 2
+pisa_sex_df['change'] = pisa_sex_df['change'].fillna(pisa_sex_df['change2'])
+# make all column headers into strings
+pisa_sex_df.columns = pisa_sex_df.columns.astype(str)
+pisa_sex_df = pisa_sex_df.reset_index()
+
+# st.write(pisa_sex_df.shape)
+
+
+# use size to determine bar width, need to screw with padding most likely to get them all to fit?
+change_rating_chart = alt.Chart(pisa_sex_df).mark_bar().encode(
+    y=alt.Y('change:Q', title='Change in Average Rating'),
+    x=alt.X('country_name:N', title='Country', axis=alt.Axis(labelFontSize=10, labelPadding=0.5)),
+    color=alt.Color('change', scale=alt.Scale(scheme='blues'), title='Change in Average Rating'),
+    tooltip=['change']
+).properties(
+    title='Change in Average Rating from 2003 to 2018',
+    width=800
+
+)
+
+st.altair_chart(change_rating_chart, use_container_width=False)
 
