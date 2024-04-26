@@ -50,7 +50,7 @@ url_geojson = 'https://github.com/bkarduck/custom-jsons/blob/main/asia.geo.json'
 
 
 # custom_world = alt.topo_feature('https://github.com/bkarduck/custom-jsons/blob/main/asia.geo.json', 'geometry')
-data_url_geojson = alt.Data(url=url_geojson, format=alt.DataFormat(property="features"))
+# data_url_geojson = alt.Data(url=url_geojson, format=alt.DataFormat(property="features"))
 
 
 url_geojson = "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson"
@@ -185,6 +185,32 @@ rating = alt.Chart(countries).mark_geoshape().transform_lookup(
             ).interactive()
 
 
+
+# .project(
+#     type= 'mercator',
+#     scale= 350,                          # Magnify
+#     center= [20,50],                     # [lon, lat]
+#     clipExtent= [[0, 0], [400, 300]],    # [[left, top], [right, bottom]]
+# ).properties(
+#     title='Europe (Mercator)',
+#     width=400, height=300
+# )
+
+# europ = alt.topo_feature(data.world_110m.url, 'countries')
+
+# base2= alt.Chart(europ).mark_geoshape(
+#     fill='#666666',
+#     stroke='white'
+# ).project(
+#     type= 'mercator',
+#     scale= 250,                          # Magnify
+#     center= [20,50],                     # [lon, lat]
+#     clipExtent= [[0, 0], [400, 300]],    # [[left, top], [right, bottom]]
+# ).properties(
+#     title='Europe (Mercator)',
+#     width=400, height=300
+# )
+
  
 chart = (
     (base + rating).properties(width=600, height=600)
@@ -200,7 +226,7 @@ values = st.slider(
 st.write('year selected:', values)
 
 pisa_filtered2 = pisa_total[pisa_total['time'] == values]
-eu_chart = alt.Chart(data_url_geojson).mark_geoshape().transform_filter(
+eu_chart = alt.Chart(data_url_geojson,title='Europe').mark_geoshape(stroke='white').transform_filter(
         alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Europe', ])
     ).transform_lookup(
         lookup="properties.iso_a3",
@@ -214,11 +240,21 @@ eu_chart = alt.Chart(data_url_geojson).mark_geoshape().transform_filter(
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
             alt.Tooltip("rating:Q", title="Rating"),]
-            ).properties(width=600, height=500).project(
-type='mercator', reflectY=False, scale=200, translate=[50, 550])
+            ).properties(width=400, height=270).project(
+type='mercator', reflectY=False, scale=150, translate=[150, 300])
+
+eu_base = alt.Chart(data_url_geojson).mark_geoshape( fill='#666666',
+    stroke='white').encode().transform_filter(
+        alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Europe', ])
+    ).transform_lookup(
+        lookup="properties.iso_a3",
+        # can change this to other dfs
+        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating"]),
+    ).properties(width=400, height=270).project(
+type='mercator', reflectY=False, scale=150, translate=[150, 300])
 
 
-na_chart =alt.Chart(data_url_geojson).mark_geoshape().transform_filter(
+na_chart =alt.Chart(data_url_geojson, title='North America').mark_geoshape(stroke='white').transform_filter(
         alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Americas', ])
     ).transform_filter(alt.FieldOneOfPredicate(field='properties.continent', oneOf=['North America', ])).transform_lookup(
         lookup="properties.iso_a3",
@@ -232,9 +268,15 @@ na_chart =alt.Chart(data_url_geojson).mark_geoshape().transform_filter(
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
             alt.Tooltip("rating:Q", title="Rating"),]
-            ).properties(width=600, height=600)
+            ).properties(width=400, height=270)
 
-sa_chart = alt.Chart(data_url_geojson).mark_geoshape().transform_filter(alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Americas', ])
+na_base = alt.Chart(data_url_geojson).mark_geoshape(    fill='#666666',
+    stroke='white').encode().transform_filter(alt.FieldOneOfPredicate(field='properties.continent', oneOf=['North America', ])).transform_lookup(
+        lookup="properties.iso_a3",
+        # can change this to other dfs
+        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating"])).properties(width=400, height=270)
+
+sa_chart = alt.Chart(data_url_geojson, title='South America').mark_geoshape(stroke='white').transform_filter(alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Americas', ])
     ).transform_filter(alt.FieldOneOfPredicate(field='properties.continent', oneOf=['South America', ])).transform_lookup(
         lookup="properties.iso_a3",
         # can change this to other dfs
@@ -247,11 +289,22 @@ sa_chart = alt.Chart(data_url_geojson).mark_geoshape().transform_filter(alt.Fiel
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
             alt.Tooltip("rating:Q", title="Rating"),]
-            ).properties(width=600, height=600).project(
-type='mercator', reflectY=False, scale=200, translate=[500, 100])
+            ).properties(width=400, height=270).project(
+type='mercator', reflectY=False, scale=170, translate=[400, 50])
 
 
-aus_asia_chart = alt.Chart(data_url_geojson).mark_geoshape().transform_filter(alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Asia', 'Oceania', ])).transform_filter(alt.FieldOneOfPredicate(field='properties.region_wb', oneOf=['East Asia & Pacific', ])
+sa_base = alt.Chart(data_url_geojson).mark_geoshape( fill='#666666',
+    stroke='white').encode().transform_filter(alt.FieldOneOfPredicate(field='properties.continent', oneOf=['South America', ])).transform_lookup(
+        lookup="properties.iso_a3",
+        # can change this to other dfs
+        from_=alt.LookupData(data=pisa_filtered2, key="code", fields=["rating"])).properties(width=400, height=270).project(
+type='mercator', reflectY=False, scale=170, translate=[400, 50])
+
+
+
+
+
+aus_asia_chart = alt.Chart(data_url_geojson,title='Australia and East Asia').mark_geoshape(stroke='white').transform_filter(alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Asia', 'Oceania', ])).transform_filter(alt.FieldOneOfPredicate(field='properties.region_wb', oneOf=['East Asia & Pacific', ])
     ).transform_lookup(
         lookup="properties.iso_a3",
         # can change this to other dfs
@@ -264,11 +317,22 @@ aus_asia_chart = alt.Chart(data_url_geojson).mark_geoshape().transform_filter(al
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
             alt.Tooltip("rating:Q", title="Rating"),]
-            ).properties(width=600, height=500).project(type='equalEarth',  scale=240, translate=[100, 180], rotate=[-135, -25 ,0])
+            ).properties(width=400, height=270).project(type='equalEarth',  scale=140, translate=[200, 100], rotate=[-135, -25 ,0])
+#rotate=[-135, -25 ,0]
+#.properties(width=600, height=500).project(type='equalEarth',  scale=240, translate=[100, 180], rotate=[-135, -25 ,0])
+#.properties(width=300, height=270).project(type='equalEarth',  scale=160, translate=[200, 80])
+# view=alt.ViewConfig(strokeWidth=1, stroke='red')
+aus_asia_base = alt.Chart(data_url_geojson).mark_geoshape(    fill='#666666',
+    stroke='white').encode().transform_filter(alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Asia', 'Oceania', ])).transform_filter(alt.FieldOneOfPredicate(field='properties.region_wb', oneOf=['East Asia & Pacific', ])).properties(width=400, height=270).project(type='equalEarth',  scale=140, translate=[200, 100], rotate=[-135, -25 ,0])
 
 final_chart = alt.hconcat(
-    alt.vconcat(na_chart, sa_chart),
-    alt.vconcat(eu_chart, aus_asia_chart)
+    alt.vconcat(na_base + na_chart, sa_base + sa_chart),
+    alt.vconcat(eu_base + eu_chart, aus_asia_base+aus_asia_chart)
 
 )
 st.altair_chart(final_chart, use_container_width=True)
+
+
+
+
+
