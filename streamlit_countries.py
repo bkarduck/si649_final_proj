@@ -52,7 +52,7 @@ custom_world = gpd.read_file('europe.geo.json')
 
 #simple polygon data, raw from github
 # custom jsons https://geojson-maps.kyd.au
-url_geojson = 'https://github.com/bkarduck/custom-jsons/blob/main/asia.geo.json'
+# url_geojson = 'https://github.com/bkarduck/custom-jsons/blob/main/asia.geo.json'
 
 
 # custom_world = alt.topo_feature('https://github.com/bkarduck/custom-jsons/blob/main/asia.geo.json', 'geometry')
@@ -100,7 +100,7 @@ data_url_geojson = alt.Data(url=url_geojson, format=alt.DataFormat(property="fea
 
 
 #simple polygon data, raw from github
-url_geojson = 'https://raw.githubusercontent.com/mattijn/datasets/master/two_polygons.geo.json'
+
 
 # url_geojson = 'https://github.com/bkarduck/custom-jsons/blob/main/europe.geo.json'
 # data_geojson_remote = alt.Data(url=url_geojson, format=alt.DataFormat(property='features',type='json'))
@@ -190,33 +190,6 @@ rating = alt.Chart(countries).mark_geoshape().transform_lookup(
             alt.Tooltip("rating:Q", title="Rating"),]
             ).interactive()
 
-
-
-# .project(
-#     type= 'mercator',
-#     scale= 350,                          # Magnify
-#     center= [20,50],                     # [lon, lat]
-#     clipExtent= [[0, 0], [400, 300]],    # [[left, top], [right, bottom]]
-# ).properties(
-#     title='Europe (Mercator)',
-#     width=400, height=300
-# )
-
-# europ = alt.topo_feature(data.world_110m.url, 'countries')
-
-# base2= alt.Chart(europ).mark_geoshape(
-#     fill='#666666',
-#     stroke='white'
-# ).project(
-#     type= 'mercator',
-#     scale= 250,                          # Magnify
-#     center= [20,50],                     # [lon, lat]
-#     clipExtent= [[0, 0], [400, 300]],    # [[left, top], [right, bottom]]
-# ).properties(
-#     title='Europe (Mercator)',
-#     width=400, height=300
-# )
-
  
 chart = (
     (base + rating).properties(width=600, height=600)
@@ -253,7 +226,6 @@ eu_chart = alt.Chart(data_url_geojson,title='Europe').mark_geoshape(stroke='whit
             "rating_bins_num:O",
             scale=alt.Scale(scheme="reds", reverse=True),
             sort = 'descending',
-            # sort= ['5', '4', '3', '2', '1'],
             legend=alt.Legend(title='Rating', labelExpr=axis_labels),
             # ignore null
 
@@ -287,10 +259,7 @@ na_chart =alt.Chart(data_url_geojson, title='North America').mark_geoshape(strok
         fill=alt.Color(
             "rating_bins_num:O",
             scale=alt.Scale(scheme="reds", reverse=True),
-            # sort= ['5', '4', '3', '2', '1'],
-            # sort= alt.SortField('rating_bins_num:O', order='descending'),
-
-            # order=alt.Order('rating_bins_num:O', sort='ascending'),
+      
             legend=alt.Legend(title='Rating', labelExpr=axis_labels),
         ), 
         tooltip=[
@@ -315,11 +284,8 @@ sa_chart = alt.Chart(data_url_geojson, title='South America').mark_geoshape(stro
         fill=alt.Color(
             "rating_bins_num:O",
             scale=alt.Scale(scheme="reds", reverse=True),
-            # sort= alt.SortField('rating_bins_num:O', order='ascending'),
-            # sort= ['Very High', 'High', 'Medium', 'Low', 'Very Low'],
-            # order=alt.Order('rating_bins_num:O', sort='ascending'),
+        
             legend=alt.Legend(title='Rating', labelExpr=axis_labels),
-            # legend={1:'Very Low', 2:'Low', 3:'Medium',4:'High', 5:'Very High'}
         ), 
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
@@ -340,7 +306,7 @@ type='mercator', reflectY=False, scale=170, translate=[400, 50])
 
 
 
-aus_asia_chart = alt.Chart(data_url_geojson,title='Australia and East Asia').mark_geoshape(stroke='white').transform_filter(alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Asia', 'Oceania', ])).transform_filter(alt.FieldOneOfPredicate(field='properties.region_wb', oneOf=['East Asia & Pacific', ])
+aus_asia_chart = alt.Chart(data_url_geojson,title='Australia, New Zealand and East Asia').mark_geoshape(stroke='white').transform_filter(alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Asia', 'Oceania', ])).transform_filter(alt.FieldOneOfPredicate(field='properties.region_wb', oneOf=['East Asia & Pacific', ])
     ).transform_lookup(
         lookup="properties.iso_a3",
         # can change this to other dfs
@@ -350,10 +316,7 @@ aus_asia_chart = alt.Chart(data_url_geojson,title='Australia and East Asia').mar
 ).encode(
         fill=alt.Color(
             "rating_bins_num:O",
-            #'rating:Q',
-            # sort= alt.SortField('rating_bins_num:O', order='ascending'),
-            # sort = ['Very High', 'High', 'Medium', 'Low', 'Very Low'],
-            # order=alt.Order('rating_bins_num:O', sort='ascending'),
+          
             legend=alt.Legend(title='Rating', labelExpr=axis_labels),
             scale=alt.Scale(scheme="reds", reverse=True),
         ), 
@@ -363,8 +326,7 @@ aus_asia_chart = alt.Chart(data_url_geojson,title='Australia and East Asia').mar
             ).properties(width=400, height=250).project(type='equalEarth',  scale=120, translate=[200, 90], rotate=[-135, -25 ,0])
 #rotate=[-135, -25 ,0]
 #.properties(width=600, height=500).project(type='equalEarth',  scale=240, translate=[100, 180], rotate=[-135, -25 ,0])
-#.properties(width=300, height=270).project(type='equalEarth',  scale=160, translate=[200, 80])
-# view=alt.ViewConfig(strokeWidth=1, stroke='red')
+
 aus_asia_base = alt.Chart(data_url_geojson).mark_geoshape(    fill='#666666',
     stroke='white').encode().transform_filter(alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Asia', 'Oceania', ])).transform_filter(alt.FieldOneOfPredicate(field='properties.region_wb', oneOf=['East Asia & Pacific', ])).properties(width=400, height=250).project(type='equalEarth',  scale=120, translate=[200, 90], rotate=[-135, -25 ,0])
 
@@ -374,7 +336,6 @@ final_chart = alt.hconcat(
 
 )
 st.altair_chart(final_chart, use_container_width=True)
-
 
 
 
