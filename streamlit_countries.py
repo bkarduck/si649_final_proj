@@ -229,7 +229,7 @@ pisa_sex_df.loc[pisa_sex_df['country_name'] == 'Türkiye', 'country_name'] = 'Tu
 
 # change in ratings plot 
 change_rating_chart = alt.Chart(pisa_sex_df).mark_bar(color='royalblue').encode(
-    y=alt.Y('change:Q', title='Change in Average Rating'),
+    y=alt.Y('change:Q', title='Change in Average PISA Score'),
     # move x axis labels down from the line
 
     x=alt.X('country_name:N', title='Country', axis=alt.Axis(labelFontSize=10.5, labelPadding=10), sort='-y'),
@@ -238,7 +238,7 @@ change_rating_chart = alt.Chart(pisa_sex_df).mark_bar(color='royalblue').encode(
     # sort least to greatest
     order=alt.Order('change:Q', sort='descending'),
 ).properties(
-    title='Change in Average Rating from 2003 to 2018',
+    title='Change in Average PISA Score from 2003 to 2018',
     width=800
 
 )
@@ -259,7 +259,7 @@ st.write("These questions raise a question: PISA is often used to justify a bigg
 
 st.subheader("What correlates with PISA scores?")
 
-st.subheader("Visualization 3: Comparing Gini Index and Education Expenditure to PISA Scores")
+st.subheader("Visualization 3: Comparing Gini Index and Education Expenditure (as % GDP) to PISA Scores")
 
 
 
@@ -310,7 +310,7 @@ chart_education = alt.Chart(pisa_total_2018).mark_circle(size=40).encode(
 
     color = alt.Color('new_region:N', scale=alt.Scale(domain=domain, range=range_), legend=alt.Legend(title='Region')),
   
-    tooltip = [alt.Tooltip('country_name:N', title='Country'), alt.Tooltip('rating:Q', title='Average PISA Score'), alt.Tooltip('expenditure_on _education_pct_gdp:Q', title='Expenditure on Education as Percent GDP')]
+    tooltip = [alt.Tooltip('country_name:N', title='Country'), alt.Tooltip('rating:Q', title='Average PISA Score'), alt.Tooltip('expenditure_on _education_pct_gdp:Q', title='Education Expenditure (%)', format='.2f')]
 ).properties(
     width=350,
     height=400
