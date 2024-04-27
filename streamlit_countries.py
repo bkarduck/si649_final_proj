@@ -77,7 +77,7 @@ eu_chart = alt.Chart(data_url_geojson,title='Europe').mark_geoshape(stroke='whit
             "rating_bins_num:O",
             scale=alt.Scale(scheme="reds", reverse=True),
             sort = 'descending',
-            legend=alt.Legend(title='Average Pisa Scores', labelExpr=axis_labels),
+            legend=alt.Legend(title='Average PISA Scores', labelExpr=axis_labels),
             # ignore null
 
         ), 
@@ -111,7 +111,7 @@ na_chart =alt.Chart(data_url_geojson, title='North America').mark_geoshape(strok
             "rating_bins_num:O",
             scale=alt.Scale(scheme="reds", reverse=True),
       
-            legend=alt.Legend(title='Average Pisa Scores', labelExpr=axis_labels),
+            legend=alt.Legend(title='Average PISA Scores', labelExpr=axis_labels),
         ), 
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
@@ -136,7 +136,7 @@ sa_chart = alt.Chart(data_url_geojson, title='South America').mark_geoshape(stro
             "rating_bins_num:O",
             scale=alt.Scale(scheme="reds", reverse=True),
         
-            legend=alt.Legend(title='Average Pisa Scores', labelExpr=axis_labels),
+            legend=alt.Legend(title='Average PISA Scores', labelExpr=axis_labels),
         ), 
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
@@ -168,7 +168,7 @@ aus_asia_chart = alt.Chart(data_url_geojson,title='Australia, New Zealand and Ea
         fill=alt.Color(
             "rating_bins_num:O",
           
-            legend=alt.Legend(title='Average Pisa Scores', labelExpr=axis_labels),
+            legend=alt.Legend(title='Average PISA Scores', labelExpr=axis_labels),
             scale=alt.Scale(scheme="reds", reverse=True),
         ), 
         tooltip=[
