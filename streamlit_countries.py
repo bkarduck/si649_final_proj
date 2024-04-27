@@ -20,6 +20,7 @@ pisa_total = pisa_total.drop(columns=['country','index_code'])
 pisa_total['name'] = pisa_total['country_name']
 pisa_total['time'] = pisa_total['time'].astype(int)
 pisa_total['rating_bins'] = pd.qcut(pisa_total['rating'], q= [0, 0.2, 0.4, 0.6, 0.8, 1], labels=['Very Low', 'Low', 'Medium','High', 'Very High'])
+#, labels=['Very Low', 'Low', 'Medium','High', 'Very High']
 pisa_total['rating_bins_num'] = pd.qcut(pisa_total['rating'], q= [0, 0.2, 0.4, 0.6, 0.8, 1], labels=[5, 4, 3, 2, 1])
 
 # url = "https://raw.githubusercontent.com/dallascard/si649_public/main/altair_hw4/small-airports.json"
@@ -76,7 +77,7 @@ pisa_filtered2 = pisa_total[pisa_total['time'] == values]
 
 
 axis_labels = (
-    'datum.label == 1 ? "Very High" : datum.label == 3 ? "High" : datum.label == 3 ? "Medium" :datum.label == 4 ? "Low" :"Very Low"')
+    'datum.label == 1 ? "Very High" : datum.label == 2 ? "High" : datum.label == 3 ? "Medium" : datum.label == 4 ? "Low" : "Very Low"')
 #     "datum.label == 1 ? 'Very Low' : datum.label == 2 ? 'Low' : datum.label == 3 ? 'Medium' :datum.label == 4 ? 'High' :'Very High'"
 # )
 
