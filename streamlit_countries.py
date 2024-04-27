@@ -25,7 +25,8 @@ pisa_total['rating_bins_num'] = pd.qcut(pisa_total['rating'], q= [0, 0.2, 0.4, 0
 
 
 st.title('What is Standardized Testing Telling Us About Student Performance?')
-st.header('Unwrapping and breaking down PISA scores to determine what leads to high student performance.')
+st.header('By: Bella Karduck and Rosalie Morrissey', divider='grey')
+st.header('Unwrapping and breaking down PISA scores to determine what leads to high student performance.', divider=False)
 st.write("Standardized testing has become ubiquitous in the American K-12 schooling experience. First introduced in the mid-1800s, college entrance exams were introduced in the early 1900s. In today’s world, we often use standardized assessments to measure student achievement and teacher effectiveness. However, they were initially designed to measure student’s abilities with the ongoing trend of quantifying intelligence at the time. In the US, the “No Child Left Behind” policy accelerated standardized testing and increased it from secondary students to all grade school students. As a part of the policy, schools would be punished if their testing scores did not show improvement. The policy ended in 2015 and was replaced with the “Every Student Succeeds Act,” which gave states and individual families more control over determining the standards students should be held to.")
 
 st.write("International standardized testing emerged in 1997 when the Organization for Economic Co-operation and Development (OECD) launched the Programme for International Student Assessment (PISA). The test is taken by 15-year-olds and looks at performance in reading, science, and mathematics every three years. The first test was administered in 2000, and the most recent was conducted in 2022. Due to the timing and availability of the 2022 data, it will not be analyzed in this article.")
