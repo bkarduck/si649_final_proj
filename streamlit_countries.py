@@ -191,7 +191,7 @@ st.caption("Data taken from OECD's PISA scores from 2003-2018. The very low scor
 
 st.write("OECD reports that part of the function of PISA is to allow benchmarking of a country's performance and to see what instructional methods are effective. This can be seen with Finland’s consistently high scores and the best-selling book “Teach Like Finland.” OECD touts the success of Germany in using the data to change the school structure and increase scores. However, while as impressive as it sounds, this is not the whole picture. Improvement did occur, but the long-term scoring showed a decrease in student scores for Germany. However, Germany is not alone. The overall average score for PISA has gone down.")
 
-st.subheader("Visualization 2: Improvement and deterioration of PISA Scores over time")
+st.subheader("Visualization 2: Improvement and Deterioration of PISA Scores Over Time")
 
 sex_choices=list(pisa_df["sex"].unique())
 sex_choices.sort(reverse=True)
