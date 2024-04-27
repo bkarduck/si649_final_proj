@@ -2,7 +2,6 @@
 import panel as pn
 import pandas as pd
 import altair as alt
-# from vega_datasets import data
 import json
 import numpy as np
 import streamlit as st
@@ -20,18 +19,9 @@ pisa_total = pisa_total.drop(columns=['country','index_code'])
 pisa_total['name'] = pisa_total['country_name']
 pisa_total['time'] = pisa_total['time'].astype(int)
 pisa_total['rating_bins'] = pd.qcut(pisa_total['rating'], q= [0, 0.2, 0.4, 0.6, 0.8, 1], labels=['Very Low', 'Low', 'Medium','High', 'Very High'])
-#, labels=['Very Low', 'Low', 'Medium','High', 'Very High']
+
 pisa_total['rating_bins_num'] = pd.qcut(pisa_total['rating'], q= [0, 0.2, 0.4, 0.6, 0.8, 1], labels=[5, 4, 3, 2, 1])
 
-# url = "https://raw.githubusercontent.com/dallascard/si649_public/main/altair_hw4/small-airports.json"
-# europe= 'https://github.com/amcharts/amcharts4/blob/master/dist/geodata/es2015/json/region/world/europeUltra.json'
-# from vega_datasets import data
-# countries = alt.topo_feature(data.world_110m.url, "countries")
-# countries = alt.topo_feature(europe, "geometry")
-# https://en.wikipedia.org/wiki/ISO_3166-1_numeric
-# country_codes_all = pd.read_csv(
-#     "https://raw.githubusercontent.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv"
-# )
 
 
 st.title('What is Standardized Testing Telling Us About Student Performance?')
@@ -60,13 +50,7 @@ year_options.sort()
 
 yearSelector = alt.selection_interval()
 
-# selected_events = st.radio('Select Events:', options=year_options)
 
-# pisa_filtered = pisa_total[pisa_total['time'] == selected_events]
-
-
-
-# selected_events2 = st.radio('Select Events2:', options=year_options)
 values = st.slider(
     'Select a year',
    min_value=2003, max_value=2018, value=2003, step=3)
@@ -78,8 +62,7 @@ pisa_filtered2 = pisa_total[pisa_total['time'] == values]
 
 axis_labels = (
     'datum.label == 1 ? "Very High" : datum.label == 2 ? "High" : datum.label == 3 ? "Medium" : datum.label == 4 ? "Low" : "Very Low"')
-#     "datum.label == 1 ? 'Very Low' : datum.label == 2 ? 'Low' : datum.label == 3 ? 'Medium' :datum.label == 4 ? 'High' :'Very High'"
-# )
+
 
 eu_chart = alt.Chart(data_url_geojson,title='Europe').mark_geoshape(stroke='white').transform_filter(
         alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Europe', ])
@@ -204,7 +187,7 @@ final_chart = alt.hconcat(
 )
 st.altair_chart(final_chart, use_container_width=True)
 
-st.caption("Data taken from OECD's PISA scores from 2003-2018")
+st.caption("Data taken from OECD's PISA scores from 2003-2018. The very low scores are below 474.6, low is between 474.6 and 491.2, medium is between 491.2 and 501.8, high ranges between 501.8, 516 and very high is any score above 516. ")
 
 st.write("OECD reports that part of the function of PISA is to allow benchmarking of a country's performance and to see what instructional methods are effective. This can be seen with Finland’s consistently high scores and the best-selling book “Teach Like Finland.” OECD touts the success of Germany in using the data to change the school structure and increase scores. However, while as impressive as it sounds, this is not the whole picture. Improvement did occur, but the long-term scoring showed a decrease in student scores for Germany. However, Germany is not alone. The overall average score for PISA has gone down.")
 
@@ -310,7 +293,6 @@ chart_gini = alt.Chart(pisa_total_2018).mark_circle(size=40).encode(
     color=alt.Color('new_region:N', scale=alt.Scale(domain=domain, range=range_), legend=alt.Legend(title='Region')),
 
     tooltip = [alt.Tooltip('country_name:N', title='Country'), alt.Tooltip('rating:Q', title='Average PISA Score'), alt.Tooltip('gini_index:Q', title='Gini Index')]
-
 ).properties(
     width=350,
     height=400
@@ -318,11 +300,11 @@ chart_gini = alt.Chart(pisa_total_2018).mark_circle(size=40).encode(
 trend_gini = chart_gini.transform_regression('gini_index', 'rating').mark_line(color = 'dimgrey', strokeWidth=1.4).encode(color = 
      alt.Color(legend=None))
 
-# pisa_total_2018 = pisa_total[pisa_total['time'] == 2018]
+
 domain = ['Asia and Oceania', "Europe", "North and South America"]
 range_ = ['darkgreen', 'mediumvioletred', 'dodgerblue']
 chart_education = alt.Chart(pisa_total_2018).mark_circle(size=40).encode(
-    # x='expenditure_on _education_pct_gdp:Q',
+ 
     x = alt.X('expenditure_on _education_pct_gdp:Q', scale=alt.Scale(domain=(2, 8)), title='Education Expenditure as Percent GDP', axis=alt.Axis(tickCount=12, grid=False)),
     y = alt.Y('rating:Q', scale=alt.Scale(domain=(340, 560)), title='Average PISA Scores'), 
 
