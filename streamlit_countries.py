@@ -20,7 +20,7 @@ pisa_total = pisa_total.drop(columns=['country','index_code'])
 pisa_total['name'] = pisa_total['country_name']
 pisa_total['time'] = pisa_total['time'].astype(int)
 pisa_total['rating_bins'] = pd.qcut(pisa_total['rating'], q= [0, 0.2, 0.4, 0.6, 0.8, 1], labels=['Very Low', 'Low', 'Medium','High', 'Very High'])
-pisa_total['rating_bins_num'] = pd.qcut(pisa_total['rating'], q= [0, 0.2, 0.4, 0.6, 0.8, 1], labels=[1, 2, 3, 4, 5])
+pisa_total['rating_bins_num'] = pd.qcut(pisa_total['rating'], q= [0, 0.2, 0.4, 0.6, 0.8, 1], labels=[5, 4, 3, 2, 1])
 
 url = "https://raw.githubusercontent.com/dallascard/si649_public/main/altair_hw4/small-airports.json"
 # europe= 'https://github.com/amcharts/amcharts4/blob/master/dist/geodata/es2015/json/region/world/europeUltra.json'
@@ -236,8 +236,9 @@ pisa_filtered2 = pisa_total[pisa_total['time'] == values]
 
 
 axis_labels = (
-    "datum.label == 1 ? 'Very Low' : datum.label == 2 ? 'Low' : datum.label == 3 ? 'Medium' :datum.label == 4 ? 'High' :'Very High'"
-)
+    'datum.label == 1 ? "Very High" : datum.label == 3 ? "High" : datum.label == 3 ? "Medium" :datum.label == 4 ? "Low" :"Very Low"')
+#     "datum.label == 1 ? 'Very Low' : datum.label == 2 ? 'Low' : datum.label == 3 ? 'Medium' :datum.label == 4 ? 'High' :'Very High'"
+# )
 
 eu_chart = alt.Chart(data_url_geojson,title='Europe').mark_geoshape(stroke='white').transform_filter(
         alt.FieldOneOfPredicate(field='properties.region_un', oneOf=['Europe', ])
@@ -250,9 +251,9 @@ eu_chart = alt.Chart(data_url_geojson,title='Europe').mark_geoshape(stroke='whit
 ).encode(
         fill=alt.Color(
             "rating_bins_num:O",
-            scale=alt.Scale(scheme="reds"),
-            # order=alt.Order('rating_bins_num:O', sort='ascending'),
-            # sort= alt.SortField('rating_bins_num:O', order='ascending'),
+            scale=alt.Scale(scheme="reds", reverse=True),
+            sort = 'descending',
+            # sort= ['5', '4', '3', '2', '1'],
             legend=alt.Legend(title='Rating', labelExpr=axis_labels),
             # ignore null
 
@@ -285,8 +286,9 @@ na_chart =alt.Chart(data_url_geojson, title='North America').mark_geoshape(strok
 ).encode(
         fill=alt.Color(
             "rating_bins_num:O",
-            scale=alt.Scale(scheme="reds"),
-            # sort= alt.SortField('rating_bins_num:O', order='ascending'),
+            scale=alt.Scale(scheme="reds", reverse=True),
+            # sort= ['5', '4', '3', '2', '1'],
+            # sort= alt.SortField('rating_bins_num:O', order='descending'),
 
             # order=alt.Order('rating_bins_num:O', sort='ascending'),
             legend=alt.Legend(title='Rating', labelExpr=axis_labels),
@@ -312,9 +314,9 @@ sa_chart = alt.Chart(data_url_geojson, title='South America').mark_geoshape(stro
 ).encode(
         fill=alt.Color(
             "rating_bins_num:O",
-            scale=alt.Scale(scheme="reds"),
-            sort= alt.SortField('rating_bins_num:O', order='ascending'),
-
+            scale=alt.Scale(scheme="reds", reverse=True),
+            # sort= alt.SortField('rating_bins_num:O', order='ascending'),
+            # sort= ['Very High', 'High', 'Medium', 'Low', 'Very Low'],
             # order=alt.Order('rating_bins_num:O', sort='ascending'),
             legend=alt.Legend(title='Rating', labelExpr=axis_labels),
             # legend={1:'Very Low', 2:'Low', 3:'Medium',4:'High', 5:'Very High'}
@@ -350,10 +352,10 @@ aus_asia_chart = alt.Chart(data_url_geojson,title='Australia and East Asia').mar
             "rating_bins_num:O",
             #'rating:Q',
             # sort= alt.SortField('rating_bins_num:O', order='ascending'),
-
+            # sort = ['Very High', 'High', 'Medium', 'Low', 'Very Low'],
             # order=alt.Order('rating_bins_num:O', sort='ascending'),
             legend=alt.Legend(title='Rating', labelExpr=axis_labels),
-            scale=alt.Scale(scheme="reds"),
+            scale=alt.Scale(scheme="reds", reverse=True),
         ), 
         tooltip=[
             alt.Tooltip("properties.name:N", title="Country"),
@@ -377,11 +379,10 @@ st.altair_chart(final_chart, use_container_width=True)
 
 
 sex_choices=list(pisa_df["sex"].unique())
-# sex_choices=list(map(lambda x:int(x),sex_choices))
-# sex_choices.sort()
+sex_choices.sort(reverse=True)
 
 
-selected_sex = st.radio('Select Sex (Or Total of Both):', options=sex_choices)
+selected_sex = st.radio('Select Sex (Or Total of Both):', options=sex_choices, index=0)
 pisa_sex_filtered = pisa_df[pisa_df['sex'] == selected_sex]
 
 
@@ -396,16 +397,31 @@ pisa_sex_df['change'] = pisa_sex_df['change'].fillna(pisa_sex_df['change2'])
 # make all column headers into strings
 pisa_sex_df.columns = pisa_sex_df.columns.astype(str)
 pisa_sex_df = pisa_sex_df.reset_index()
+# drop na in change column
+pisa_sex_df = pisa_sex_df.dropna(subset=['change'])
 
-# st.write(pisa_sex_df.shape)
+# change United States to USA, United Kingdom to UK, Netherlands (kingdom of the) to Netherlands, Korea to South Korea, 'Türkiye' to Turkey
+pisa_sex_df.loc[pisa_sex_df['country_name'] == 'United States of America', 'country_name'] = 'USA'
+# 'United Kingdom of Great Britain and Northern Ireland'
+pisa_sex_df.loc[pisa_sex_df['country_name'] == 'United Kingdom of Great Britain and Northern Ireland', 'country_name'] = 'UK'
+pisa_sex_df.loc[pisa_sex_df['country_name'] == 'Netherlands (Kingdom of the)', 'country_name'] = 'Netherlands'
+# 'Republic of Korea'
+pisa_sex_df.loc[pisa_sex_df['country_name'] == 'Republic of Korea', 'country_name'] = 'South Korea'
+# 'Türkiye'
+pisa_sex_df.loc[pisa_sex_df['country_name'] == 'Türkiye', 'country_name'] = 'Turkey'
+
+
+
 
 
 # use size to determine bar width, need to screw with padding most likely to get them all to fit?
-change_rating_chart = alt.Chart(pisa_sex_df).mark_bar().encode(
+change_rating_chart = alt.Chart(pisa_sex_df).mark_bar(color='blue').encode(
     y=alt.Y('change:Q', title='Change in Average Rating'),
-    x=alt.X('country_name:N', title='Country', axis=alt.Axis(labelFontSize=10, labelPadding=0.5)),
-    color=alt.Color('change', scale=alt.Scale(scheme='blues'), title='Change in Average Rating'),
-    tooltip=['change']
+    x=alt.X('country_name:N', title='Country', axis=alt.Axis(labelFontSize=10, labelPadding=0.5), sort='-y'),
+    # color='blue',
+    tooltip=['change', 'country_name'], 
+    # sort least to greatest
+    order=alt.Order('change:Q', sort='descending'),
 ).properties(
     title='Change in Average Rating from 2003 to 2018',
     width=800
